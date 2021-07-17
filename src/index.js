@@ -6,10 +6,6 @@ const routes = require('./routes');
 
 const server = http.createServer((request, response) => {
   const parsedUrl = url.parse(request.url, true);
-  console.log(parsedUrl);
-
-  console.log(`Request Method: ${request.method} | Endpoint: ${parsedUrl.pathname}`); 
-
   let { pathname } = parsedUrl
   let id = null;
 
@@ -23,7 +19,6 @@ const server = http.createServer((request, response) => {
   const route = routes.find((routeObj) => (
     routeObj.endpoint === pathname && routeObj.method === request.method
   )); 
-
 
   if(route){
     request.query = parsedUrl.query;
@@ -45,4 +40,6 @@ const server = http.createServer((request, response) => {
   }
 })
 
-server.listen(3000, () => console.log('🔥 Server Started at http://localhost:3000'));
+server.listen(3000, () => (
+  console.lconsole.log('🔥 Server Started at http://localhost:3000')
+));
