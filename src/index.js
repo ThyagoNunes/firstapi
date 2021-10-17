@@ -30,7 +30,7 @@ const server = http.createServer((request, response) => {
     }
 
     if( ['POST', 'PUT', 'PATCH'].includes(request.method)) {
-      bodyParser(request, () => oute.handler(request, response));
+      bodyParser(request, () => route.handler(request, response));
     } else {
       route.handler(request, response);
     }
@@ -40,6 +40,4 @@ const server = http.createServer((request, response) => {
   }
 })
 
-server.listen(3000, () => (
-  console.lconsole.log('🔥 Server Started at http://localhost:3000')
-));
+server.listen(3000, () => console.log('🔥 Server Started at http://localhost:3000'));
