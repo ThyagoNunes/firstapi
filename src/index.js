@@ -1,43 +1,44 @@
 const http = require('http');
-const url = require('url');
+const { URL } = require('url');
 
-const bodyParser = require('./helpers/bodyParser')
 const routes = require('./routes');
+const bodyParser = require('./helpers/bodyParser');
 
-const server = http.createServer((request, response) => {
-  const parsedUrl = url.parse(request.url, true);
-  let { pathname } = parsedUrl
+const app = http.createServer((request, response) => {
+  const parsedUrl = new URL(`http://localhost:3333${request.url}`);
+  console.log(`Request Method: ${request.method} | Endpoint: ${request.url}`);
+  console.log(parsedUrl);
+
+  let { pathname } = parsedUrl;
   let id = null;
 
   const splitEndPoint = pathname.split('/').filter(Boolean);
-
-  if(splitEndPoint.length > 1 ) {
+  if (splitEndPoint.length > 1) {
     pathname = `/${splitEndPoint[0]}/:id`;
     id = splitEndPoint[1];
   }
 
   const route = routes.find((routeObj) => (
     routeObj.endpoint === pathname && routeObj.method === request.method
-  )); 
+  ));
 
-  if(route){
-    request.query = parsedUrl.query;
+  if (route) {
     request.params = { id };
-
+    request.query = Object.fromEntries(parsedUrl.searchParams);
     response.send = (statusCode, body) => {
-    response.writeHead(statusCode, { 'Content-Type': 'application/json'});
-    response.end(JSON.stringify(body))
-    }
+      response.writeHead(statusCode, { 'content-type': 'application/json' });
+      response.end(JSON.stringify(body));
+    };
 
-    if( ['POST', 'PUT', 'PATCH'].includes(request.method)) {
+    if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
       bodyParser(request, () => route.handler(request, response));
     } else {
       route.handler(request, response);
     }
   } else {
-    response.writeHead(404, { 'Content-Type': 'text/html'});
-    response.end(`Cannot ${request.method} ${parsedUrl.pathname}`)
+    response.writeHead(404, { 'content-type': 'text/html' });
+    response.end(`Cannot ${request.method} ${request.url}`);
   }
-})
+});
 
-server.listen(3000, () => console.log('🔥 Server Started at http://localhost:3000'));
+app.listen(3333, () => console.log('🔥🖥  Server starter at http://localhost:3333 🖥 🔥 '));

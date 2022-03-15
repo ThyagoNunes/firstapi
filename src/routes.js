@@ -1,29 +1,29 @@
-const UserController = require('./Controllers/UserController')
+const ContactController = require('./Controllers/ContactController');
 
 module.exports = [
   {
-    endpoint: '/users',
-    method: 'GET', 
-    handler: UserController.listUsers,
+    endpoint: '/contacts',
+    method: 'GET',
+    handler: ContactController.index,
   },
   {
-    endpoint: '/users/:id',
-    method: 'GET', 
-    handler: UserController.getUserById,
+    endpoint: '/contacts/:id',
+    method: 'GET',
+    handler: ContactController.show,
   },
   {
-    endpoint: '/users',
-    method: 'POST', 
-    handler: UserController.createUser,
+    endpoint: '/contacts',
+    method: 'POST',
+    handler: ContactController.store,
   },
   {
-    endpoint: '/users/:id',
-    method: 'PUT', 
-    handler: UserController.updateUser,
+    endpoint: '/contacts/:id',
+    method: 'PUT',
+    handler: ContactController.update,
   },
   {
-    endpoint: '/users/:id',
-    method: 'DELETE', 
-    handler: UserController.deleteUser,
+    endpoint: '/contacts/:id',
+    method: 'DELETE',
+    handler: ContactController.delete,
   },
-]
+];
