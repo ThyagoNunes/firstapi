@@ -57,7 +57,7 @@ module.exports = {
 
     const contactEmailExists = contacts.find((contact) => contact.email === email);
 
-    if (contactEmailExists && email) {
+    if (contactEmailExists && !contacts.email) {
       return response.send(400, { error: 'This e-amil is already in use' });
     }
 
