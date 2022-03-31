@@ -19,21 +19,30 @@ module.exports = {
     if (!contactExist) {
       return response.send(404, { error: 'User not find' });
     }
+
     return response.send(200, contactExist);
   },
+
   store(request, response) {
-    const body = request.body;
+    const { body } = request;
     const newContact = {
       id: v4(),
       name: body.name,
       email: body.email,
       phone: body.phone,
       birth: body.birth,
-      category_id: v4(),
+      categoryId: v4(),
     };
+
+    const contactEmailExists = contacts.find((contact) => contact.email === body.email);
+
+    if (contactEmailExists) {
+      return response.send(400, { error: 'This e-amil is already in use' });
+    }
     contacts.push(newContact);
     return response.send(200, newContact);
   },
+
   update(request, response) {
     const { id } = request.params;
     const {
@@ -44,6 +53,12 @@ module.exports = {
 
     if (!contactExist) {
       return response.send(404, { error: 'User not find' });
+    }
+
+    const contactEmailExists = contacts.find((contact) => contact.email === email);
+
+    if (contactEmailExists && email) {
+      return response.send(400, { error: 'This e-amil is already in use' });
     }
 
     contacts = contacts.map((contact) => {
@@ -58,11 +73,11 @@ module.exports = {
       }
       return contact;
     });
-
     return response.send(200, {
       name, email, phone, birth,
     });
   },
+
   delete(request, response) {
     const { id } = request.params;
     const contactExist = contacts.find((contact) => contact.id === id);
@@ -72,6 +87,6 @@ module.exports = {
     }
 
     contacts = contacts.filter((contact) => contact.id !== id);
-    return response.send(204, { ok: true });
+    return response.send(204, { deleted: true });
   },
 };
