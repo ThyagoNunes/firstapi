@@ -11,5 +11,8 @@ module.exports = {
     ecmaVersion: 'latest',
   },
   rules: {
+    'no-console': 0,
+    'prefer-const': 0,
+    'prefer-destructuring': 0,
   },
 };
