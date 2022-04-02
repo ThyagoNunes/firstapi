@@ -55,9 +55,9 @@ module.exports = {
       return response.send(404, { error: 'User not find' });
     }
 
-    const contactEmailExists = contacts.find((contact) => contact.email === email);
+    const emailExists = contacts.find((contact) => contact.email === email);
 
-    if (contactEmailExists && contactEmailExists.email === email) {
+    if (emailExists && emailExists.email === email) {
       return response.send(400, { error: 'This e-mail is already in use' });
     }
 
