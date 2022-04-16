@@ -1,92 +1,111 @@
-const { v4 } = require('uuid');
-let contacts = require('../mocks/contacts');
+const ContactsRepository = require('../repositories/ContactsRepository');
 
-module.exports = {
-  index(request, response) {
+class ContactController {
+  async index(request, response) {
     const { order } = request.query;
-    const sortedContacts = contacts.sort((a, b) => {
-      if (order === 'desc') {
-        return a.id < b.id ? 1 : -1;
-      }
-      return a.id > b.id ? 1 : -1;
+    const cContacts = await ContactsRepository.findAll(order);
+    response.send(200, cContacts);
+  }
+
+  async show(request, response) {
+    const { id } = request.params;
+    const contactExists = await ContactsRepository.findById(id);
+
+    if (!contactExists) {
+      return response.send(404, { error: 'Contact not found' });
+    }
+    response.send(200, contactExists);
+  }
+
+  async store(request, response) {
+    let {
+      id, name, email, phone, birth,
+    } = request.body;
+
+    if (!name) {
+      return response.send(404, { error: 'name is required' });
+    }
+    if (!email) {
+      return response.send(404, { error: 'email is required' });
+    }
+    if (!phone) {
+      return response.send(404, { error: 'phone is required' });
+    }
+    if (!birth) {
+      return response.send(404, { error: 'birth is required' });
+    }
+
+    name = name.toUpperCase();
+    email = email.toUpperCase();
+    phone = phone.toUpperCase();
+    birth = birth.toUpperCase();
+
+    const emailExist = await ContactsRepository.findByEmail(email);
+
+    if (emailExist) {
+      return response.send(400, { error: 'this e-mail is already in use' });
+    }
+
+    const contact = await ContactsRepository.store({
+      id, name, email, phone, birth,
     });
-    response.send(200, sortedContacts);
-  },
-  show(request, response) {
+    response.send(200, contact);
+  }
+
+  async update(request, response) {
     const { id } = request.params;
-    const contactExist = contacts.find((contact) => contact.id === id);
-
-    if (!contactExist) {
-      return response.send(404, { error: 'User not find' });
-    }
-
-    return response.send(200, contactExist);
-  },
-
-  store(request, response) {
-    const { body } = request;
-    const newContact = {
-      id: v4(),
-      name: body.name,
-      email: body.email,
-      phone: body.phone,
-      birth: body.birth,
-      categoryId: v4(),
-    };
-
-    const contactEmailExists = contacts.find((contact) => contact.email === body.email);
-
-    if (contactEmailExists) {
-      return response.send(400, { error: 'This e-amil is already in use' });
-    }
-    contacts.push(newContact);
-    return response.send(200, newContact);
-  },
-
-  update(request, response) {
-    const { id } = request.params;
-    const {
+    let {
       name, email, phone, birth,
     } = request.body;
 
-    const contactExist = contacts.find((contact) => contact.id === id);
-
-    if (!contactExist) {
-      return response.send(404, { error: 'User not find' });
+    if (!name) {
+      return response.send(404, { error: 'name is required' });
+    }
+    if (!email) {
+      return response.send(404, { error: 'email is required' });
+    }
+    if (!phone) {
+      return response.send(404, { error: 'phone is required' });
+    }
+    if (!birth) {
+      return response.send(404, { error: 'birth is required' });
     }
 
-    const emailExists = contacts.find((contact) => contact.email === email);
+    name = name.toUpperCase();
+    email = email.toUpperCase();
+    phone = phone.toUpperCase();
+    birth = birth.toUpperCase();
 
-    if (emailExists && emailExists.email === email) {
+    const contactExists = await ContactsRepository.findById(id);
+
+    if (!contactExists) {
+      return response.send(404, { error: 'Contact not found' });
+    }
+    const emailExists = await ContactsRepository.findByEmail(email);
+    if (emailExists) {
       return response.send(400, { error: 'This e-mail is already in use' });
     }
 
-    contacts = contacts.map((contact) => {
-      if (contact.id === id) {
-        return {
-          ...contact,
-          name,
-          email,
-          phone,
-          birth,
-        };
-      }
-      return contact;
-    });
-    return response.send(200, {
+    await ContactsRepository.update(id, {
       name, email, phone, birth,
     });
-  },
 
-  delete(request, response) {
+    response.send(200, {
+      name, email, phone, birth,
+    });
+  }
+
+  async delete(request, response) {
     const { id } = request.params;
-    const contactExist = contacts.find((contact) => contact.id === id);
+    const contactExist = await ContactsRepository.findById(id);
 
     if (!contactExist) {
-      return response.send(404, { error: 'User not find' });
+      return response.send(404, { error: 'Contact not found' });
     }
 
-    contacts = contacts.filter((contact) => contact.id !== id);
-    return response.send(204, { deleted: true });
-  },
-};
+    await ContactsRepository.delete(id);
+    response.send(204, { deleted: true });
+  }
+}
+
+module.exports = new ContactController();

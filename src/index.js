@@ -21,22 +21,21 @@ const app = http.createServer((request, response) => {
   ));
 
   if (route) {
-    request.params = { id };
     request.query = Object.fromEntries(parsedUrl.searchParams);
+    request.params = { id };
     response.send = (statusCode, body) => {
-      response.writeHead(statusCode, { 'content-type': 'application/json' });
+      response.writeHead(statusCode, { 'Content-Type': 'Application/Json' });
       response.end(JSON.stringify(body));
     };
-
     if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
       bodyParser(request, () => route.handler(request, response));
     } else {
       route.handler(request, response);
     }
   } else {
-    response.writeHead(404, { 'content-type': 'text/html' });
+    response.writeHead(400, { 'content-type': 'text/html' });
     response.end(`Cannot ${request.method} ${request.url}`);
   }
 });
 
-app.listen(3333, () => console.log('🔥🖥  Server starter at http://localhost:3333 🖥 🔥 '));
+app.listen(3333, () => console.log('🔥 Server started at http://localhost:3333'));

@@ -3,6 +3,7 @@ function bodyParser(request, callback) {
   request.on('data', (chunk) => {
     body += chunk;
   });
+
   request.on('end', () => {
     body = JSON.parse(body);
     request.body = body;
